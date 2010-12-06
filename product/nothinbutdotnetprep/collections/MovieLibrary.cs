@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace nothinbutdotnetprep.collections
@@ -14,72 +15,158 @@ namespace nothinbutdotnetprep.collections
 
         public IEnumerable<Movie> all_movies()
         {
-            return movies;
+            foreach (var m in movies)
+                yield return m;
         }
 
         public void add(Movie movie)
         {
-            throw new NotImplementedException();
+            foreach (var m in movies)
+                if (m.title == movie.title)
+                    return;
+
+            if (!movies.Contains(movie))
+                movies.Add(movie);
         }
 
         public IEnumerable<Movie> sort_all_movies_by_title_descending
         {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                var dict = new SortedDictionary<String, Movie>();
+                foreach (var m in movies)
+                    dict.Add(m.title, m);
+
+                List<Movie> l = new List<Movie>();
+
+                foreach (var key in dict.Keys)
+                {
+                    l.Add(dict[key]);
+                }
+                Movie[] marr = l.ToArray();
+                Array.Reverse(marr);
+
+                return marr;
+            }
         }
 
         public IEnumerable<Movie> all_movies_published_by_pixar()
         {
-            throw new NotImplementedException();
+            foreach (var m in movies)
+                if (m.production_studio == ProductionStudio.Pixar)
+                    yield return m;
         }
 
         public IEnumerable<Movie> all_movies_published_by_pixar_or_disney()
         {
-            throw new NotImplementedException();
+            foreach (var m in movies)
+                if (m.production_studio == ProductionStudio.Pixar | m.production_studio == ProductionStudio.Disney)
+                    yield return m;
         }
 
         public IEnumerable<Movie> sort_all_movies_by_title_ascending
         {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                var dict = new SortedDictionary<String, Movie>();
+                foreach (var m in movies)
+                    dict.Add(m.title, m);
+                var l = new List<Movie>();
+                foreach (var key in dict.Keys)
+                {
+                    l.Add(dict[key]);
+                }
+                return l;
+            }
         }
 
         public IEnumerable<Movie> sort_all_movies_by_movie_studio_and_year_published()
         {
-            throw new NotImplementedException();
+            var moviesSortedByYearAsc = this.sort_all_movies_by_date_published_ascending();
+            var moviesSortedByStudioAndYear = new List<Movie>();
+
+            ProductionStudio[] studios = new ProductionStudio[]
+                                             {                                                                                              
+                                                 ProductionStudio.MGM,
+                                                 ProductionStudio.Pixar,
+                                                 ProductionStudio.Dreamworks,                                                                                                
+                                                 ProductionStudio.Universal,
+                                                 ProductionStudio.Disney
+                                             };
+
+            for (Int32 i = 0; i < studios.Length; i++)
+            {
+                var s = studios[i];
+                foreach (var m in moviesSortedByYearAsc)
+                {
+                    if (m.production_studio == s)
+                        moviesSortedByStudioAndYear.Add(m);
+                }
+            }
+
+            return moviesSortedByStudioAndYear;
         }
 
         public IEnumerable<Movie> all_movies_not_published_by_pixar()
         {
-            throw new NotImplementedException();
+            foreach (var m in movies)
+            {
+                if (m.production_studio != ProductionStudio.Pixar)
+                    yield return m;
+            }
         }
 
         public IEnumerable<Movie> all_movies_published_after(int year)
         {
-            throw new NotImplementedException();
+            foreach (var m in movies)
+                if (m.date_published.Year > year)
+                    yield return m;
         }
 
         public IEnumerable<Movie> all_movies_published_between_years(int startingYear, int endingYear)
         {
-            throw new NotImplementedException();
+            foreach (var m in movies)
+                if (m.date_published.Year >= startingYear && m.date_published.Year <= endingYear)
+                    yield return m;
         }
 
         public IEnumerable<Movie> all_kid_movies()
         {
-            throw new NotImplementedException();
+            foreach (var m in movies)
+                if (m.genre == Genre.kids)
+                    yield return m;
         }
 
         public IEnumerable<Movie> all_action_movies()
         {
-            throw new NotImplementedException();
+            foreach (var m in movies)
+                if (m.genre == Genre.action)
+                    yield return m;
         }
 
         public IEnumerable<Movie> sort_all_movies_by_date_published_descending()
-        {
-            throw new NotImplementedException();
+        {           
+            var m = new List<Movie>(sort_all_movies_by_date_published_ascending());
+            var marr = m.ToArray();
+            Array.Reverse(marr);
+            return marr;
         }
 
         public IEnumerable<Movie> sort_all_movies_by_date_published_ascending()
         {
-            throw new NotImplementedException();
+            var dict = new SortedDictionary<DateTime, Movie>();
+           
+            foreach (var m in movies)
+                dict.Add(m.date_published, m);
+
+            List<Movie> l = new List<Movie>();
+
+            foreach (var key in dict.Keys)            
+                l.Add(dict[key]);
+            
+            Movie[] marr = l.ToArray();
+
+            return marr;
         }
     }
 }
